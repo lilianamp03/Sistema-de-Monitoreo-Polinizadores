@@ -1,0 +1,14 @@
+[Unit]
+Description=Lectura BME688 + GPS
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/Desktop/Monitoreo
+ExecStart=/usr/bin/python3 -u /home/pi/Desktop/Monitoreo/Bme_Gps.py
+TimeoutStartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
