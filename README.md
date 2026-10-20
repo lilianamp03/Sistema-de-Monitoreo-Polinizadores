@@ -4,10 +4,6 @@ Repositorio asociado al trabajo de tesis:
 
 **“Sistema automatizado para monitoreo fenológico y de polinizadores en campo integrando visión artificial y medición ambiental”.**
 
-**Universidad Veracruzana**  
-Facultad de Ingeniería Eléctrica y Electrónica  
-Ingeniería Mecatrónica  
-
 ## Descripción
 
 Este repositorio contiene los principales archivos utilizados para el desarrollo e implementación de un sistema automatizado de monitoreo basado en una Raspberry Pi 4.
