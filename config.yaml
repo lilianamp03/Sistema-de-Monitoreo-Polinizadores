@@ -1,0 +1,50 @@
+Camaras:
+  cam_fotos: 0
+  cam_eventos: 2
+
+Rutas:
+  fotos: "/home/pi/Desktop/Monitoreo/Fotos"
+  eventos: "/home/pi/Desktop/Monitoreo/Eventos"
+
+Foto_Periodica:
+  intervalo_min: 30
+
+Camara:
+  fps_cam: 15
+  fps_video: 15
+  ancho: 640
+  alto: 480
+  formato: "MJPG"
+
+Mog2:
+  history: 600
+  var_threshold: 40
+  detect_shadows: false
+
+
+Filtro_movimiento:
+  thresh_binary: 150
+  area_min: 500
+  area_max: 5000
+  open_iter: 2 
+  close_iter: 3
+
+Eventos:
+  cooldown: 5.0
+  duracion_video: 10
+
+Sistema:
+  silenciar_stderr: true
+  
+Preview:
+  mostrar_eventos: false
+  nombre_ventana: "Monitoreo"
+  
+Red_Neuronal:
+  activar: true
+  modelo: "/home/pi/Desktop/Monitoreo/Modelos/best_int8.onnx"
+  imgsz: 640
+  confianza: 0.25
+  usar_mog2_respaldo: false
+  espera_mog2_s: 2.0
+  rearme_mog2_s: 1.0

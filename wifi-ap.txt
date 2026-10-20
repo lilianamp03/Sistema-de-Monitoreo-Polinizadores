@@ -1,0 +1,52 @@
+pi@raspberrypi:~ $ cat $(which wifi-ap)
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Activando MODO AP…"
+
+# 1) NetworkManager no toca wlan0
+sudo mkdir -p /etc/NetworkManager/conf.d
+printf "[keyfile]\nunmanaged-devices=interface-name:wlan0\n" | sudo tee /etc/NetworkManager/conf.d/unmanaged-wlan0.conf >/dev/null
+sudo systemctl restart NetworkManager || true
+
+# 2) Sube wlan0 y asegura IP del AP en dhcpcd
+sudo rfkill unblock wifi || true
+sudo ip link set wlan0 up || true
+sudo systemctl enable --now dhcpcd
+sudo systemctl restart dhcpcd
+
+# Espera a que aparezca 10.10.0.1/24
+for i in {1..12}; do
+  if ip -4 -o addr show dev wlan0 | grep -q '10\.10\.0\.1/'; then
+    echo "wlan0 = 10.10.0.1/24"
+    break
+  fi
+  sleep 1
+  if [ "$i" -eq 12 ]; then
+    echo "Forzando IP 10.10.0.1/24 en wlan0"
+    sudo ip addr add 10.10.0.1/24 dev wlan0 || true
+  fi
+done
+
+# 3) Revisión de puerto 53 y sintaxis de dnsmasq
+sudo dnsmasq --test
+if sudo ss -lupn | grep -q ':53'; then
+  echo "Puerto 53 ocupado; liberando…"
+  sudo pkill -f "dnsmasq" 2>/dev/null || true
+  sudo systemctl stop systemd-resolved 2>/dev/null || true
+  sudo systemctl disable systemd-resolved 2>/dev/null || true
+fi
+
+# 4) Levanta AP + DHCP
+sudo systemctl enable hostapd dnsmasq
+sudo systemctl restart hostapd
+sudo systemctl restart dnsmasq
+
+# 5) Arranca el HTTP
+sudo systemctl enable --now ap-http
+
+echo "	AP y HTTP listos."
+echo "   SSID: $(grep ^ssid /etc/hostapd/hostapd.conf | cut -d= -f2)"
+echo "   Clave: $(grep ^wpa_passphrase /etc/hostapd/hostapd.conf | cut -d= -f2)"
+echo "   IP del AP: 10.10.0.1"
+echo "   HTTP:     http://10.10.0.1:8000"

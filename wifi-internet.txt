@@ -1,0 +1,40 @@
+#!/bin/sh
+set -e
+echo "Cambiando a modo internet (Wi-Fi cliente)"
+
+# 0) Apagar microservidor del AP
+systemctl stop ap-http.service || true
+
+# 1) Apagar punto de acceso
+systemctl disable --now hostapd dnsmasq || true
+
+# 2) Permitir que NetworkManager administre wlan0
+rm -f /etc/NetworkManager/conf.d/unmanaged-wlan0.conf || true
+systemctl restart NetworkManager
+
+# 3) Quitar IP fija 10.10.0.1 del AP (por si quedó pegada)
+#    Intentar en ap0 y en wlan0 (según tu setup)
+ip addr del 10.10.0.1/24 dev ap0 2>/dev/null || true
+ip addr del 10.10.0.1/24 dev wlan0 2>/dev/null || true
+
+# 4) Limpiar bloque estático del AP en dhcpcd (si existe)
+sed -i '/^interface wlan0/, $d' /etc/dhcpcd.conf || true
+systemctl restart dhcpcd || true
+
+# 5) Esperar a que haya una IP válida de Wi-Fi (hasta 30 s)
+echo "Esperando IP de Wi-Fi..."
+for i in $(seq 1 30); do
+  if ip -4 addr show scope global dev wlan0 | grep -q 'inet ' ; then
+    break
+  fi
+  sleep 1
+done
+
+# 6) Levantar (o reiniciar) microservidor de Wi-Fi
+systemctl restart wifi-http.service || true
+systemctl status  wifi-http.service --no-pager -l || true
+
+echo ""
+echo "Ahora puedes conectarte a tu red con:"
+echo "  nmcli device wifi list"
+echo "  nmcli device wifi connect \"<SSID>\" password \"<PASS>\""

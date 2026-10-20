@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Panel Local de Monitoreo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 20px;
+      color: #222;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .contenedor {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .tarjeta {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    img {
+      width: 100%;
+      max-width: 640px;
+      display: block;
+      margin: auto;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .dato {
+      font-size: 18px;
+      margin: 8px 0;
+    }
+
+    .ok {
+      color: green;
+      font-weight: bold;
+    }
+
+    .mal {
+      color: red;
+      font-weight: bold;
+    }
+
+
+    /* ==========================================
+       SECCIÓN DE ARCHIVOS
+       ========================================== */
+
+    .archivos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .archivo {
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .archivo h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .archivo p {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.4;
+      min-height: 55px;
+    }
+
+    .boton {
+      display: inline-block;
+      background: #333;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-size: 15px;
+    }
+
+    .boton:hover {
+      background: #555;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+  <div class="contenedor">
+
+    <h1>Panel local de monitoreo</h1>
+
+
+    <!-- ==========================================
+         ÚLTIMA IMAGEN
+         ========================================== -->
+
+    <div class="tarjeta">
+
+      <h2>Última imagen</h2>
+
+      <img
+        id="ultimaImagen"
+        src="ultima.jpg"
+        alt="Última imagen capturada"
+      >
+
+    </div>
+
+
+    <!-- ==========================================
+         DATOS DE LOS SENSORES
+         ========================================== -->
+
+    <div class="tarjeta">
+
+      <h2>Últimos sensores</h2>
+
+      <p class="dato">
+        Fecha/hora:
+        <span id="fecha">---</span>
+      </p>
+
+      <p class="dato">
+        Temperatura:
+        <span id="temperatura">---</span> °C
+      </p>
+
+      <p class="dato">
+        Humedad:
+        <span id="humedad">---</span> %
+      </p>
+
+      <p class="dato">
+        Presión:
+        <span id="presion">---</span> hPa
+      </p>
+
+      <p class="dato">
+        Gas:
+        <span id="gas">---</span> Ohm
+      </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         GPS
+         ========================================== -->
+
+    <div class="tarjeta">
+
+      <h2>Estado del GPS</h2>
+
+      <p class="dato">
+        GPS:
+        <span id="gpsEstado">---</span>
+      </p>
+
+      <p class="dato">
+        Latitud:
+        <span id="latitud">---</span>
+      </p>
+
+      <p class="dato">
+        Longitud:
+        <span id="longitud">---</span>
+      </p>
+
+    </div>
+
+
+    <!-- ==========================================
+         ARCHIVOS ALMACENADOS
+         ========================================== -->
+
+    <div class="tarjeta">
+
+      <h2>Archivos almacenados</h2>
+
+      <div class="archivos">
+
+
+        <!-- DATOS CSV -->
+
+        <div class="archivo">
+
+          <h3>Histórico de datos</h3>
+
+          <p>
+            Consulta los archivos CSV con los registros
+            ambientales y las coordenadas GPS almacenadas
+            por el sistema.
+          </p>
+
+          <a
+            class="boton"
+            href="Datos/"
+            target="_blank">
+            Ver archivos
+          </a>
+
+        </div>
+
+
+        <!-- FOTOGRAFÍAS PERIÓDICAS -->
+
+        <div class="archivo">
+
+          <h3>Imágenes periódicas</h3>
+
+          <p>
+            Consulta las fotografías capturadas
+            periódicamente durante el monitoreo.
+          </p>
+
+          <a
+            class="boton"
+            href="Monitoreo_Fotos/"
+            target="_blank">
+            Ver imágenes
+          </a>
+
+        </div>
+
+
+        <!-- EVENTOS -->
+
+        <div class="archivo">
+
+          <h3>Eventos detectados</h3>
+
+          <p>
+            Consulta las imágenes y videos generados
+            durante los eventos detectados por el sistema.
+          </p>
+
+          <a
+            class="boton"
+            href="Eventos/"
+            target="_blank">
+            Ver eventos
+          </a>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+
+  <!-- ==========================================
+       ACTUALIZACIÓN AUTOMÁTICA DEL PANEL
+       ========================================== -->
+
+  <script>
+
+    async function actualizarPanel() {
+
+      try {
+
+        /* Evita que el navegador utilice
+           versiones anteriores almacenadas en caché */
+
+        const respuesta = await fetch(
+          "estado.json?nocache=" + Date.now()
+        );
+
+        const datos = await respuesta.json();
+
+
+        /* DATOS AMBIENTALES */
+
+        document.getElementById("fecha").textContent =
+          datos.fecha || "---";
+
+        document.getElementById("temperatura").textContent =
+          datos.temperatura ?? "---";
+
+        document.getElementById("humedad").textContent =
+          datos.humedad ?? "---";
+
+        document.getElementById("presion").textContent =
+          datos.presion ?? "---";
+
+        document.getElementById("gas").textContent =
+          datos.gas ?? "---";
+
+
+        /* GPS */
+
+        document.getElementById("latitud").textContent =
+          datos.latitud ?? "---";
+
+        document.getElementById("longitud").textContent =
+          datos.longitud ?? "---";
+
+
+        const gps =
+          document.getElementById("gpsEstado");
+
+
+        if (datos.gps_valido === true) {
+
+          gps.textContent =
+            "Con coordenadas válidas";
+
+          gps.className = "ok";
+
+        }
+
+        else {
+
+          gps.textContent =
+            "Sin coordenadas válidas";
+
+          gps.className = "mal";
+
+        }
+
+
+        /* ACTUALIZAR ÚLTIMA IMAGEN */
+
+        document.getElementById("ultimaImagen").src =
+          "ultima.jpg?nocache=" + Date.now();
+
+
+      }
+
+      catch (error) {
+
+        console.log(
+          "No se pudo actualizar el panel",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* Actualización inicial */
+
+    actualizarPanel();
+
+
+    /* Actualización automática cada 10 segundos */
+
+    setInterval(
+      actualizarPanel,
+      10000
+    );
+
+  </script>
+
+
+</body>
+
+</html>
